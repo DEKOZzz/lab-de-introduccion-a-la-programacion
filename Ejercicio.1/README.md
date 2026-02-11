@@ -21,7 +21,8 @@ env/
 
 La cual contiene todos los archivos necesarios para el entorno virtual.
 
-📸 <img width="537" height="281" alt="pt 2" src="https://github.com/user-attachments/assets/7f6ddaa3-f6cf-45ae-98eb-c5da46144271" />
+📸<img width="555" height="198" alt="kiki" src="https://github.com/user-attachments/assets/1227698c-df3b-40e0-92bf-c65a97899baf" />
+
 
 
 
@@ -101,3 +102,4 @@ Preparar el proyecto para subirse a GitHub
 
 
 El uso de entornos virtuales es una práctica fundamental para trabajar de forma ordenada y profesional en Python.
+
