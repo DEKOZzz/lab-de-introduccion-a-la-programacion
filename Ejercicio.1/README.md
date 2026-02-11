@@ -6,7 +6,8 @@ ejercicio.1
 
 Esta carpeta funciona como el directorio principal del proyecto, donde se almacenan el entorno virtual y los archivos de Python.
 
-📸 Agregar captura de la carpeta creada aquí
+📸 <img width="309" height="294" alt="pt 1" src="https://github.com/user-attachments/assets/ea4d6db5-b960-48a1-b685-462df85a155a" />
+
 
 🧱 2. Creación del entorno virtual
 
@@ -20,7 +21,9 @@ env/
 
 La cual contiene todos los archivos necesarios para el entorno virtual.
 
-📸 Agregar captura del entorno virtual creado aquí
+📸 <img width="537" height="281" alt="pt 2" src="https://github.com/user-attachments/assets/7f6ddaa3-f6cf-45ae-98eb-c5da46144271" />
+
+
 
 🔐 3. Permitir la ejecución de scripts en PowerShell
 
@@ -34,7 +37,6 @@ Después se confirmó la acción escribiendo:
 
 Y
 
-📸 Agregar captura del cambio de política aquí
 
 ▶️ 4. Activación del entorno virtual
 
@@ -48,7 +50,8 @@ Ejemplo:
 
 (env) PS C:\Users\...\ejercicio.1>
 
-📸 Agregar captura del entorno virtual activo aquí
+📸<img width="546" height="229" alt="pt 3" src="https://github.com/user-attachments/assets/334f0e2c-22a3-4466-a8e9-9132af3d9e16" />
+
 
 📦 5. Instalación de librerías
 
@@ -58,7 +61,8 @@ pip install numpy
 
 Esta librería se instaló únicamente dentro del entorno virtual, no de forma global.
 
-📸 Agregar captura de la instalación de numpy aquí
+📸
+<img width="540" height="207" alt="pt 4" src="https://github.com/user-attachments/assets/1235ad13-4cfb-474f-b620-963fb4bd8b80" />
 
 📄 6. Creación del archivo Python
 
@@ -69,7 +73,8 @@ ejercicio.1.py
 Este archivo está preparado para contener el código del ejercicio.
 En este caso, el archivo no fue ejecutado, únicamente se creó como parte de la estructura del proyecto.
 
-📸 Agregar captura del archivo ejercicio.1.py aquí
+📸 <img width="858" height="251" alt="pt 5" src="https://github.com/user-attachments/assets/6499ac0a-8e5a-4f29-adb1-f4c86ea551ab" />
+
 
 📂 7. Buenas prácticas con Git
 
@@ -79,7 +84,6 @@ env/
 
 Esto evita subir archivos innecesarios al repositorio.
 
-📸 Agregar captura del archivo .gitignore aquí
 
 🚀 Conclusión
 
@@ -94,5 +98,6 @@ Activar el entorno en PowerShell
 Instalar librerías dentro del entorno virtual
 
 Preparar el proyecto para subirse a GitHub
+
 
 El uso de entornos virtuales es una práctica fundamental para trabajar de forma ordenada y profesional en Python.
