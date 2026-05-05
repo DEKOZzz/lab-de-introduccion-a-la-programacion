@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kwik-E-Mart 🛒</title>
+
+<!-- SCANNER PRO -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<style>
+body {
+  font-family: Arial;
+  margin: 0;
+  background: #87CEEB;
+}
+
+header {
+  background: #FFD90F;
+  color: black;
+  padding: 15px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 10px;
+}
+
+.card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  border: 3px solid #FFD90F;
+}
+
+#reader {
+  width: 100%;
+  height: 250px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: black;
+}
+
+button {
+  margin-top: 8px;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  background: #FF6F00;
+  color: white;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+button.red {
+  background: #D32F2F;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+}
+
+.status {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.producto {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px 0;
+}
+
+.total {
+  font-size: 20px;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  🍩 Kwik-E-Mart POS 🍩
+</header>
+
+<div class="container">
+
+  <!-- ESCÁNER -->
+  <div class="card">
+    <h3>Modo</h3>
+    <button onclick="setModo('cliente')">📱 Cliente</button>
+    <button onclick="setModo('caja')">💻 Caja</button>
+
+    <h3>Escáner</h3>
+    <button onclick="iniciarScanner()">📷 Activar</button>
+    <button onclick="detenerScanner()">🛑 Detener</button>
+
+    <div id="reader"></div>
+
+    <div class="status" id="status">Estado: listo</div>
+
+    <h3>Agregar manual</h3>
+    <input id="nombreManual" placeholder="Nombre del producto">
+    <input id="precioManual" placeholder="Precio">
+    <button onclick="agregarManual()">➕ Agregar producto</button>
+
+  </div>
+
+  <!-- CARRITO -->
+  <div class="card">
+    <h3>Carrito</h3>
+    <div id="carrito"></div>
+    <p class="total">Total: $<span id="total">0</span></p>
+    <button class="red" onclick="limpiarCarrito()">🗑️ Vaciar carrito</button>
+  </div>
+
+</div>
+
+<script>
+
+/* FIREBASE */
+const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  databaseURL: "https://punto-de-venta-8a12f-default-rtdb.firebaseio.com"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+/* ESTADO */
+let scannerActivo = false;
+let modo = "caja";
+
+/* MODO */
+function setModo(n) {
+  modo = n;
+  actualizarStatus("Modo: " + modo);
+  if (modo === "cliente") iniciarScanner();
+  else detenerScanner();
+}
+
+/* SCANNER */
+function iniciarScanner() {
+  if (scannerActivo) return;
+
+  Quagga.init({
+    inputStream: {
+      type: "LiveStream",
+      target: document.querySelector('#reader'),
+      constraints: { facingMode: "environment" }
+    },
+    decoder: {
+      readers: [
+        "ean_reader","upc_reader","code_128_reader","code_39_reader"
+      ]
+    }
+  }, function(err) {
+    if (err) return console.log(err);
+
+    Quagga.start();
+    scannerActivo = true;
+    actualizarStatus("📷 Escaneando...");
+  });
+
+  Quagga.onDetected(async function(data) {
+    const codigo = data.codeResult.code.trim();
+    actualizarStatus("Código: " + codigo);
+    await agregarProducto(codigo);
+  });
+}
+
+/* DETENER */
+function detenerScanner() {
+  if (!scannerActivo) return;
+  Quagga.stop();
+  scannerActivo = false;
+}
+
+/* STATUS */
+function actualizarStatus(msg) {
+  document.getElementById("status").textContent = "Estado: " + msg;
+}
+
+/* API PRODUCTO */
+async function agregarProducto(codigo) {
+  try {
+    const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${codigo}.json`);
+    const data = await res.json();
+
+    let producto;
+
+    if (data.status === 1) {
+      producto = {
+        nombre: `${data.product.product_name || "Producto"} (${data.product.brands || "Marca"})`,
+        precio: 20
+      };
+      actualizarStatus("✅ " + producto.nombre);
+    } else {
+      producto = {
+        nombre: "Producto (" + codigo + ")",
+        precio: 10
+      };
+      actualizarStatus("⚠️ No encontrado, puedes editar abajo");
+    }
+
+    db.ref("carrito").push(producto);
+
+  } catch {
+    db.ref("carrito").push({
+      nombre: "Producto (" + codigo + ")",
+      precio: 10
+    });
+  }
+}
+
+/* MANUAL */
+function agregarManual() {
+  const nombre = document.getElementById("nombreManual").value;
+  const precio = parseFloat(document.getElementById("precioManual").value);
+
+  if (!nombre || !precio) {
+    alert("Completa los campos");
+    return;
+  }
+
+  db.ref("carrito").push({ nombre, precio });
+
+  document.getElementById("nombreManual").value = "";
+  document.getElementById("precioManual").value = "";
+
+  actualizarStatus("✅ Producto agregado manualmente");
+}
+
+/* LIMPIAR */
+function limpiarCarrito() {
+  db.ref("carrito").remove();
+}
+
+/* ACTUALIZAR UI */
+db.ref("carrito").on("value", snap => {
+  const data = snap.val();
+  let total = 0;
+
+  const div = document.getElementById("carrito");
+  div.innerHTML = "";
+
+  if (!data) return;
+
+  for (let key in data) {
+    const item = data[key];
+    total += item.precio;
+
+    div.innerHTML += `
+      <div class="producto">
+        <span>${item.nombre}</span>
+        <span>$${item.precio}</span>
+      </div>
+    `;
+  }
+
+  document.getElementById("total").textContent = total;
+});
+
+</script>
+
+</body>
+</html>
